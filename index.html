@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>PASHA SHAMSHIN — Works</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%23000'/%3E%3Cline x1='9' y1='20' x2='31' y2='20' stroke='%23ECEDE9' stroke-opacity='.3' stroke-width='1.5'/%3E%3Cpath d='M11 20l3-3 3 3-3 3z' fill='%23ECEDE9'/%3E%3Cpath d='M20 20l3-3 3 3-3 3z' fill='%23ECEDE9' opacity='.7'/%3E%3Cpath d='M29 20l2.2-2.2L33.4 20l-2.2 2.2z' fill='%23ECEDE9' opacity='.45'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -18,6 +19,10 @@
   #scene.point{cursor:pointer}
   .vignette{position:fixed;inset:0;z-index:5;pointer-events:none;
     background:radial-gradient(130% 110% at 50% 50%,transparent 38%,rgba(10,11,13,.55) 72%,rgba(10,11,13,.98) 100%)}
+  .edgeblur{position:fixed;inset:0;z-index:6;pointer-events:none;
+    -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+    -webkit-mask-image:radial-gradient(ellipse 80% 78% at 50% 50%,transparent 60%,rgba(0,0,0,.15) 72%,rgba(0,0,0,.5) 82%,#000 94%);
+    mask-image:radial-gradient(ellipse 80% 78% at 50% 50%,transparent 60%,rgba(0,0,0,.15) 72%,rgba(0,0,0,.5) 82%,#000 94%)}
 
   .ui{position:fixed;z-index:10;font-size:11px;letter-spacing:.16em;text-transform:uppercase}
   .brand{top:22px;left:26px;display:flex;align-items:center;gap:11px}
@@ -80,12 +85,14 @@
   .about .cap{border:1px solid rgba(255,255,255,.18);border-radius:30px;padding:7px 14px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#C4C7CB}
   .about .links-h{color:#71757C;letter-spacing:.16em;text-transform:uppercase;font-size:11px;margin:36px 0 14px}
   .langsel{display:flex;justify-content:flex-end;margin:0 0 22px}
-  #lang{appearance:none;-webkit-appearance:none;background:rgba(255,255,255,.06);color:#ECEDE9;
-    border:1px solid rgba(255,255,255,.16);border-radius:30px;padding:8px 34px 8px 15px;
+  #lang{appearance:none;-webkit-appearance:none;
+    background:rgba(255,255,255,.06);color:#ECEDE9;
+    border:1px solid rgba(255,255,255,.12);border-radius:30px;padding:8px 36px 8px 16px;
     font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.08em;cursor:pointer;
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23ECEDE9' stroke-width='1.4' fill='none'/%3E%3C/svg%3E");
     background-repeat:no-repeat;background-position:right 14px center}
-  #lang:focus{outline:none;border-color:rgba(255,255,255,.4)}
+  #lang:focus{outline:none;border-color:rgba(255,255,255,.3)}
   #lang option{background:#15171A;color:#ECEDE9}
   .about .links{display:flex;gap:10px;flex-wrap:wrap;margin-top:0}
   .about .links a{border:1px solid rgba(255,255,255,.2);border-radius:30px;padding:11px 18px;color:#ECEDE9;text-decoration:none;font-size:11px;letter-spacing:.14em;text-transform:uppercase;transition:.3s}
@@ -142,6 +149,7 @@
 <body>
   <canvas id="scene"></canvas>
   <div class="vignette"></div>
+  <div class="edgeblur"></div>
 
   <div class="ui brand">
     <span class="logo" aria-label="Logo">
@@ -175,8 +183,8 @@
   <section class="page about" id="about"><div class="page-inner">
     <div class="langsel">
       <select id="lang" aria-label="Language">
-        <option value="ru">RU · Русский</option>
-        <option value="en">EN · English</option>
+        <option value="ru">RU</option>
+        <option value="en">EN</option>
       </select>
     </div>
     <div class="profile-head">
@@ -395,33 +403,39 @@ function layout(){
   camera.position.set(0,0,camZ); camera.lookAt(0,0,0);
   const dens = innerWidth>1400?5 : innerWidth>1100?4 : innerWidth>760?3 : 2;
   const visW=2*camZ*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*a, visH=visW/a;
-  cellW=(visW/dens)*ZOOM; cellH=cellW;
+  cellW=(visW/dens)*ZOOM; if(fine) cellW*=0.88; cellH=cellW;
   cols=Math.ceil(visW/cellW)+2; rows=Math.ceil(visH/cellH)+2;
   blockW=cols*cellW; blockH=rows*cellH;
   PHX=(cols%2)?0:cellW/2; PHY=(rows%2)?0:cellH/2;
   R=Math.max(blockW,blockH)*0.72/CURVE;
 }
-/* раскладка проектов по плиткам: без одинаковых соседей (с учётом тороидального шва), все проекты показаны */
+/* раскладка: одинаковые проекты не соседствуют (8 направлений, включая диагонали, тороидально) */
 function assignTiles(rows,cols,N){
   const cells=rows*cols, idx=(r,c)=>((r%rows+rows)%rows)*cols+((c%cols+cols)%cols);
-  const a=new Array(cells);
-  for(let k=0;k<cells;k++)a[k]=k%N;                                   // покрытие: каждый проект хотя бы раз
+  const nearby=[];
+  for(let k=0;k<cells;k++){
+    const kr=(k/cols)|0,kc=k%cols,nb=new Set();
+    for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+      if(!dr&&!dc)continue; nb.add(idx(kr+dr,kc+dc));
+    }
+    nearby.push(nb);
+  }
+  const a=new Array(cells); for(let k=0;k<cells;k++)a[k]=k%N;
   for(let k=cells-1;k>0;k--){const j=(Math.random()*(k+1))|0;[a[k],a[j]]=[a[j],a[k]];}
-  const nb=(r,c)=>[a[idx(r,c-1)],a[idx(r,c+1)],a[idx(r-1,c)],a[idx(r+1,c)]];
-  for(let pass=0;pass<3000;pass++){
-    let bad=-1,br=0,bc=0;
-    for(let r=0;r<rows&&bad<0;r++)for(let c=0;c<cols;c++){
-      if(nb(r,c).includes(a[idx(r,c)])){bad=idx(r,c);br=r;bc=c;break;}
-    }
-    if(bad<0)break;                                                   // конфликтов нет
+  for(let pass=0;pass<5000;pass++){
+    let bad=-1;
+    for(let k=0;k<cells;k++){for(const n of nearby[k])if(a[n]===a[k]){bad=k;break;}if(bad>=0)break;}
+    if(bad<0)break;
     let done=false;
-    for(let t=0;t<80&&!done;t++){
-      const j=(Math.random()*cells)|0; if(j===bad||a[j]===a[bad])continue;
-      const vi=a[bad],vj=a[j]; a[bad]=vj; a[j]=vi;
-      const jr=(j/cols)|0,jc=j%cols;
-      if(!nb(br,bc).includes(a[bad])&&!nb(jr,jc).includes(a[j]))done=true; else{a[bad]=vi;a[j]=vj;}
+    for(let t=0;t<120&&!done;t++){
+      const j=(Math.random()*cells)|0;if(j===bad||a[j]===a[bad])continue;
+      const vi=a[bad],vj=a[j];a[bad]=vj;a[j]=vi;
+      let ok=true;
+      for(const n of nearby[bad])if(a[n]===a[bad]){ok=false;break;}
+      if(ok)for(const n of nearby[j])if(a[n]===a[j]){ok=false;break;}
+      if(ok)done=true;else{a[bad]=vi;a[j]=vj;}
     }
-    if(!done){const u=new Set(nb(br,bc));for(let v=0;v<N;v++)if(!u.has(v)){a[bad]=v;break;}}
+    if(!done){const used=new Set();for(const n of nearby[bad])used.add(a[n]);for(let v=0;v<N;v++)if(!used.has(v)){a[bad]=v;break;}}
   }
   return a;
 }
@@ -585,12 +599,12 @@ setLang('ru');
 
 /* draggable 2-state toggle: thumb follows pointer, snaps on release; tap still selects */
 function dragToggle(track,thumb,items,vertical,onPick){
-  let down=false,sc=0,base=0,travel=0,moved=0,pos=0;
+  let down=false,sc=0,base=0,travel=0,moved=0,pos=0,startC=0;
   const C=e=>vertical?e.clientY:e.clientX;
   track.addEventListener('pointerdown',e=>{
     travel=vertical?(items[1].offsetTop-items[0].offsetTop):(items[1].offsetLeft-items[0].offsetLeft);
     const active=(track.classList.contains('about')||track.classList.contains('feed'))?1:0;
-    down=true;moved=0;sc=C(e);base=active*travel;pos=base;
+    down=true;moved=0;sc=C(e);startC=C(e);base=active*travel;pos=base;
     thumb.style.transition='none';
     try{track.setPointerCapture(e.pointerId);}catch(_){}
   });
@@ -604,11 +618,16 @@ function dragToggle(track,thumb,items,vertical,onPick){
     if(!down)return;down=false;
     try{track.releasePointerCapture(e.pointerId);}catch(_){}
     let idx;
-    if(moved<4){const t=e.target.closest('a,button');idx=t?items.indexOf(t):(pos>travel/2?1:0);if(idx<0)idx=pos>travel/2?1:0;}
-    else idx=pos>travel/2?1:0;
-    thumb.style.transition='';   // вернуть плавность
-    onPick(idx);                 // переключить состояние (класс задаёт цель)
-    thumb.style.transform='';    // снять инлайн -> бегунок доезжает к цели
+    if(moved<4){
+      /* клик: определяем по позиции клика относительно трека */
+      const rect=track.getBoundingClientRect();
+      const rel=vertical?(startC-rect.top):(startC-rect.left);
+      const size=vertical?rect.height:rect.width;
+      idx=rel>size/2?1:0;
+    } else idx=pos>travel/2?1:0;
+    thumb.style.transition='';
+    onPick(idx);
+    thumb.style.transform='';
   }
   track.addEventListener('pointerup',end);
   track.addEventListener('pointercancel',end);
