@@ -4,7 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>PASHA SHAMSHIN — Works</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%23000'/%3E%3Cline x1='9' y1='20' x2='31' y2='20' stroke='%23ECEDE9' stroke-opacity='.3' stroke-width='1.5'/%3E%3Cpath d='M11 20l3-3 3 3-3 3z' fill='%23ECEDE9'/%3E%3Cpath d='M20 20l3-3 3 3-3 3z' fill='%23ECEDE9' opacity='.7'/%3E%3Cpath d='M29 20l2.2-2.2L33.4 20l-2.2 2.2z' fill='%23ECEDE9' opacity='.45'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="shortcut icon" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -85,20 +86,30 @@
   .about .cap{border:1px solid rgba(255,255,255,.18);border-radius:30px;padding:7px 14px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#C4C7CB}
   .about .links-h{color:#71757C;letter-spacing:.16em;text-transform:uppercase;font-size:11px;margin:36px 0 14px}
   .langsel{display:flex;justify-content:flex-end;margin:0 0 22px}
-  #lang{appearance:none;-webkit-appearance:none;
-    background:rgba(255,255,255,.06);color:#ECEDE9;
-    border:1px solid rgba(255,255,255,.12);border-radius:30px;padding:8px 36px 8px 16px;
-    font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.08em;cursor:pointer;
-    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23ECEDE9' stroke-width='1.4' fill='none'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;background-position:right 14px center}
-  #lang:focus{outline:none;border-color:rgba(255,255,255,.3)}
-  #lang option{background:#15171A;color:#ECEDE9}
+  .lang-dd{position:relative;border-radius:30px;padding:0}
+  .lang-cur{display:flex;align-items:center;gap:6px;background:transparent;border:0;
+    color:#ECEDE9;font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.08em;
+    padding:8px 16px;cursor:pointer;border-radius:30px;transition:color .2s;white-space:nowrap}
+  .lang-cur:hover{color:#fff}
+  .lang-arrow{display:inline-block;transition:transform .3s cubic-bezier(.45,.05,.2,1);font-size:10px;opacity:.6}
+  .lang-dd.open .lang-arrow{transform:rotate(180deg)}
+  .lang-opts{position:absolute;right:0;top:calc(100% + 6px);min-width:140px;
+    background:rgba(18,19,22,.92);border:1px solid rgba(255,255,255,.1);border-radius:16px;
+    padding:6px;overflow:hidden;
+    opacity:0;transform:translateY(-6px) scale(.97);pointer-events:none;
+    transition:opacity .25s cubic-bezier(.45,.05,.2,1), transform .25s cubic-bezier(.45,.05,.2,1);
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:200}
+  .lang-dd.open .lang-opts{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+  .lang-opt{display:block;width:100%;text-align:left;background:transparent;border:0;
+    color:#C4C7CB;font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.06em;
+    padding:9px 12px;border-radius:10px;cursor:pointer;transition:background .2s,color .2s}
+  .lang-opt:hover{background:rgba(255,255,255,.08);color:#ECEDE9}
+  .lang-opt.active{color:#ECEDE9;background:rgba(255,255,255,.06)}
   .about .links{display:flex;gap:10px;flex-wrap:wrap;margin-top:0}
   .about .links a{border:1px solid rgba(255,255,255,.2);border-radius:30px;padding:11px 18px;color:#ECEDE9;text-decoration:none;font-size:11px;letter-spacing:.14em;text-transform:uppercase;transition:.3s}
   .about .links a:hover{background:#ECEDE9;color:#0A0B0D}
-  .profile-head{display:flex;align-items:center;gap:26px;margin-bottom:6px;flex-wrap:wrap}
-  .photo{position:relative;width:120px;height:120px;border-radius:50%;overflow:hidden;flex:0 0 auto;background:linear-gradient(135deg,#5E5CE6,#BF5AF2)}
+  .profile-head{display:flex;align-items:flex-start;gap:26px;margin-bottom:28px;flex-wrap:wrap}
+  .photo{position:relative;width:100px;height:100px;border-radius:50%;overflow:hidden;flex:0 0 auto;background:linear-gradient(135deg,#5E5CE6,#BF5AF2);margin-top:6px}
   .photo .mono{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:44px;color:rgba(255,255,255,.92)}
   .photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .about h1 .dl{display:block}
@@ -182,10 +193,13 @@
 
   <section class="page about" id="about"><div class="page-inner">
     <div class="langsel">
-      <select id="lang" aria-label="Language">
-        <option value="ru">RU</option>
-        <option value="en">EN</option>
-      </select>
+      <div class="lang-dd glass" id="langDd">
+        <button class="lang-cur" id="langCur" type="button">RU <span class="lang-arrow">▾</span></button>
+        <div class="lang-opts" id="langOpts">
+          <button class="lang-opt active" data-lang="ru" type="button">RU · Русский</button>
+          <button class="lang-opt" data-lang="en" type="button">EN · English</button>
+        </div>
+      </div>
     </div>
     <div class="profile-head">
       <div class="photo"><span class="mono">PS</span><img id="avatar" alt="Pasha Shamshin"></div>
@@ -571,13 +585,13 @@ let curLang='ru';
 function ruYears(n){const a=n%100,b=n%10; if(a>=11&&a<=14)return 'лет'; if(b===1)return 'год'; if(b>=2&&b<=4)return 'года'; return 'лет';}
 const I18N={
   ru:{ role:"Моушн-дизайн", contact:"Связаться →", work:"Работы", about:"Обо мне",
-    sub:a=>`Моушн-дизайнер · ${a} ${ruYears(a)}`,
+    sub:a=>`Моушн-дизайнер`,
     bio1:"Я моушн-дизайнер — оживляю изображение. Анимация, моушн-графика, фирменные системы и визуал, который ведёт историю от первого кадра до последнего.",
     bio2:"Работы охватывают брендинг, продукт, эдиториал и персонажей — сделаны для команд МТС, Ozon, Beeline и Russ × Wildberries.",
     caps:["Моушн","Анимация","Моушн-графика","Брендинг","3D","Арт-дирекшн"],
     findme:"Контакты", hint:"Тяни в любую сторону" },
   en:{ role:"Motion Design", contact:"Contact me →", work:"Work", about:"About",
-    sub:a=>`Motion Designer · ${a} y.o.`,
+    sub:a=>`Motion Designer`,
     bio1:"I'm a motion designer — I make things move. Animation, motion graphics, brand systems and visuals built to carry a story from the first frame to the last.",
     bio2:"Selected work spans branding, product, editorial and character, made with and for teams at MTS, Ozon, Beeline and Russ × Wildberries.",
     caps:["Motion","Animation","Motion Graphics","Branding","3D","Art Direction"],
@@ -590,10 +604,19 @@ function setLang(lang){
   setFinal(document.getElementById('bio1'), t.bio1);
   setFinal(document.getElementById('bio2'), t.bio2);
   setFinal(document.getElementById('linksH'), t.findme);
-  const sel=document.getElementById('lang'); if(sel)sel.value=lang;
+  const cur=document.getElementById('langCur');
+  if(cur)cur.childNodes[0].textContent=lang.toUpperCase()+' ';
+  document.querySelectorAll('.lang-opt').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
 }
-(function(){ const sel=document.getElementById('lang');
-  if(sel) sel.addEventListener('change',()=>{ setLang(sel.value); if(page==='about') decodeAbout(); });
+(function(){
+  const dd=document.getElementById('langDd'), cur=document.getElementById('langCur');
+  if(!dd)return;
+  cur.addEventListener('click',e=>{e.stopPropagation();dd.classList.toggle('open');});
+  document.querySelectorAll('.lang-opt').forEach(b=>b.addEventListener('click',()=>{
+    setLang(b.dataset.lang); dd.classList.remove('open');
+    if(page==='about') decodeAbout();
+  }));
+  document.addEventListener('click',e=>{ if(!dd.contains(e.target)) dd.classList.remove('open'); });
 })();
 setLang('ru');
 
@@ -667,7 +690,7 @@ function start(){
     av.src="https://images.weserv.nl/?url="+encodeURIComponent("pps.services.adobe.com/api/profile/320C61CA5E10CA910A495FEC@AdobeID/image/4324998b-063d-4e8d-84ce-c905e5c6d154/276")+"&w=240&output=jpg"; }
   decode(document.getElementById('wmName'),'PASHA SHAMSHIN',500);
   const sub=document.getElementById('aboutSub');
-  if(sub)sub.textContent='Motion Designer · '+AGE+' y.o.';
+  if(sub)sub.textContent='Motion Designer';
   maybeReveal();
   const _iv=setInterval(()=>{ maybeReveal(); if(revealed) clearInterval(_iv); },120);
   setTimeout(hideHint,6000);
