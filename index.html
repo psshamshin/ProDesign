@@ -659,6 +659,7 @@ dragToggle(navBar, navBar.querySelector('.nav-thumb'), [navWork,navAbout], false
 });
 dragToggle(vtEl, vtEl.querySelector('.vt-thumb'), [vtGrid,vtList], true, idx=>{
   workMode=idx===1?'feed':'grid'; page='work'; applyView();
+  if(workMode==='feed') buildFeed();
 });
 
 /* feed list (превью подхватывает обложку, когда она догрузилась в текстуру) */
@@ -666,13 +667,28 @@ function buildFeed(){
   const w=document.getElementById('feedList');w.innerHTML='';
   PROJECTS.forEach((p,i)=>{
     const a=document.createElement('a');a.className='frow';a.href=p.href;a.target='_blank';a.rel='noopener';
-    a.innerHTML=`<span class="fthumb" style="--a:${BRIGHT[i%BRIGHT.length]};--b:${BRIGHT[(i+4)%BRIGHT.length]}"><b>${String(i+1).padStart(2,'0')}</b></span>`+
+    a.innerHTML=`<span class="fthumb" style="--a:${BRIGHT[i%BRIGHT.length]};--b:${BRIGHT[(i+4)%BRIGHT.length]}"><b class="fnum">${String(i+1).padStart(2,'0')}</b></span>`+
       `<span class="fmeta"><span class="ft">${p.t}</span><span class="ftags">${p.tags.join(' · ')}</span></span>`+
       `<span class="fv">${fmt(p.v)} VIEWS</span>`;
     w.appendChild(a);
-    if(p.img){const im=new Image();im.crossOrigin='anonymous';
-      im.onload=()=>{a.querySelector('.fthumb').style.backgroundImage=`url(${im.src})`;};
-      im.src="https://images.weserv.nl/?url="+encodeURIComponent(p.img)+"&w=300&output=jpg&q=78";}
+    const thumb=a.querySelector('.fthumb'), num=a.querySelector('.fnum');
+    /* если текстура уже загружена — берём из canvas */
+    if(texCache.has(i)){
+      try{
+        const cv=document.createElement('canvas');cv.width=TW;cv.height=TH;
+        cv.getContext('2d').drawImage(texCache.get(i).image,0,0);
+        thumb.style.backgroundImage=`url(${cv.toDataURL()})`;
+        if(num)num.style.display='none';
+      }catch(_){}
+    }
+    if(p.img){
+      const im=new Image();im.crossOrigin='anonymous';
+      im.onload=()=>{
+        thumb.style.backgroundImage=`url(${im.src})`;
+        if(num)num.style.display='none';
+      };
+      im.src="https://images.weserv.nl/?url="+encodeURIComponent(p.img)+"&w=300&output=jpg&q=78";
+    }
   });
 }
 
